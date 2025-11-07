@@ -24,7 +24,7 @@ jobs:
 
       - name: Set output for log files
         id: set-outputs
-        run: echo "log-files=$(echo '[\"$(pwd)/step1.log\", \"$(pwd)/step2.log\"]')" >> $GITHUB_OUTPUT
+        run: echo "log-files=$(echo '[\"./step1.log\", \"./step2.log\"]')" >> $GITHUB_OUTPUT
 
   display-logs:
     needs: create-logs
