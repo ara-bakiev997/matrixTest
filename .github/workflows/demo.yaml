@@ -1,0 +1,46 @@
+name: CI
+
+on: 
+    push:
+
+jobs:
+  create-logs:
+    runs-on: ubuntu-latest
+    outputs:
+      log-files: ${{ steps.set-outputs.outputs.log-files }}
+    steps:
+      - name: Create logs
+        run: |
+          echo "This is step 1 log" > step1.log
+          echo "This is step 2 log" > step2.log
+
+      - name: Upload logs as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: log-files
+          path: |
+            step1.log
+            step2.log
+
+      - name: Set output for log files
+        id: set-outputs
+        run: echo "log-files=$(echo '[\"$(pwd)/step1.log\", \"$(pwd)/step2.log\"]')" >> $GITHUB_OUTPUT
+
+  display-logs:
+    needs: create-logs
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        log-file: ${{ fromJson(needs.create-logs.outputs.log-files) }}
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: log-files
+
+      - name: List downloaded files
+        run: ls -la
+
+      - run: echo "${{ toJson(needs) }}"
+      
+      - run: echo "${{ toJson(matrix) }}"
